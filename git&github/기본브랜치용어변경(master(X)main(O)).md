@@ -12,7 +12,7 @@ github에서 직접 기본 브랜치의 이름을 변경할 수도 있고, 또�
 
 `git config --global init.defaultBranch <name>`으로 git의 기본 브랜치의 이름을 바꿀 수도 있다.
 
-![https://s3-us-west-2.amazonaws.com/secure.notion-static.com/0ae0bb76-5c9a-41f2-b463-412d3a1fd92c/Untitled.png](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/0ae0bb76-5c9a-41f2-b463-412d3a1fd92c/Untitled.png)
+![image](https://user-images.githubusercontent.com/18097984/97590878-6f282e00-1a42-11eb-9ba0-bf5cfd9fa4ba.png)
 
 새로 repository 생성할 때 보이는 안내 문구도 master가 아닌 main이라고 칭하는 등 조금씩 바뀐 걸 볼 수 있다.
 
