@@ -9,25 +9,25 @@ const THE_DATE = "Dec 7, 2020 00:30:00"; //좋아하는 애니메이션 새 시�
 const theDate = new Date(THE_DATE).getTime();
 let remainder = 0;
 function getCountdown(){
-    const now = Date.now();
-    const milliseconds = theDate - now;
-    const days = Math.floor(milliseconds / (1000 * 60 * 60 * 24));
-    remainder = milliseconds % (1000 * 60 * 60 * 24);
-    const hours = Math.floor(remainder / (1000 * 60 * 60));
-    remainder = remainder % (1000 * 60 * 60);
-    const mins = Math.floor(remainder / (1000 * 60));
-    remainder = remainder % (1000 * 60);
-    const seconds = Math.floor(remainder / 1000);
+  const now = Date.now();
+  const milliseconds = theDate - now;
+  const days = Math.floor(milliseconds / (1000 * 60 * 60 * 24));
+  remainder = milliseconds % (1000 * 60 * 60 * 24);
+  const hours = Math.floor(remainder / (1000 * 60 * 60));
+  remainder = remainder % (1000 * 60 * 60);
+  const mins = Math.floor(remainder / (1000 * 60));
+  remainder = remainder % (1000 * 60);
+  const seconds = Math.floor(remainder / 1000);
 
-    paintCountdown(days, hours, mins, seconds);
+  paintCountdown(days, hours, mins, seconds);
 }
 
 function paintCountdown(days, hours, mins, seconds){
-    countdownText.innerHTML = `You have to wait for ${days}days ${hours}hours ${mins}minutes ${seconds}seconds`;
+  countdownText.innerHTML = `You have to wait for ${days}days ${hours}hours ${mins}minutes ${seconds}seconds`;
 }
 
 function init(){
-		setInterval(getCountdown, 1000);
+  setInterval(getCountdown, 1000);
 }
 
 init();
@@ -40,12 +40,12 @@ init();
 그런 다음 구글링해서 코드를 찾아봤음
 
 ```jsx
-	var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
   var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
   var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 ```
-
+(참고로 위 코드에서 distance는 내 코드의 milliseconds라고 보면 된다.)
 이외는 다 비슷하고 일, 시, 분, 초를 구하는 부분만 위처럼 달랐음. 내가 쓴 코드처럼 굳이 `remainder` 변수를 따로 쓰는 건 불필요했던 걸지도... 걍 이렇게 수식에 구겨 넣을 수 있구나...
 
 더 최적화하는 방법은 없는지 궁금하다.
