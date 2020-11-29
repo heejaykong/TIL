@@ -1,5 +1,7 @@
 # 디데이 countdown 기능 구현하기(getTime(), setInterval())
 
+2020/11/09 기록
+
 우선 구글링에서 복붙하지 않고 나 혼자 쌩으로 구현해보는 연습을 먼저 해봤다.
 
 처음에 내가 직접 짠 코드
@@ -51,6 +53,36 @@ init();
 더 최적화하는 방법은 없는지 궁금하다.
 
 아 그리고, 디데이 날짜가 다 되어서 `setInterval()`함수가 도는 걸 멈추려면 `clearInterval()`를 쓰면 되는데, 그러려면 setInterval을 변수 어딘가에 넣어서(`const 변수a = setInterval{...}`) clearInterval의 argument로 넣어야 하는 거 같다. (`clearInterval(변수a)`)
+
+
+2020/11/22 추가:
+타이머 스타일링 방법은 아래 링크를 참고함(ul, li 태그와 inline-block 속성 사용하기)
+https://codepen.io/AllThingsSmitty/pen/JJavZN
+
+
+2020/11/28 추가:
+공부하다가 아래와 같이 짤 수도 있음을 참고.
+```jsx
+function getCountdown() {
+  const Dday = new Date("2020-12-07:00:30:00+0900");
+  const now = new Date();
+  
+  const milliseconds = new Date(xmasDay - now);
+  const secondsInMs = Math.floor(milliseconds / 1000);
+  const minutesInMs = Math.floor(secondsInMs / 60);
+  const hoursInMs = Math.floor(minutesInMs / 60);
+  const days = Math.floor(hoursInMs / 24);
+  const seconds = secondsInMs % 60;
+  const minutes = minutesInMs % 60;
+  const hours = hoursInMs % 24;
+  
+  const daysStr = `${days < 10 ? `0${days}` : days}d`;
+  const hoursStr = `${hours < 10 ? `0${hours}` : hours}h`;
+  const minutesStr = `${minutes < 10 ? `0${minutes}` : minutes}m `;
+  const secondsStr = `${seconds < 10 ? `0${seconds}` : seconds}s`;
+  countdownText.innerHTML = `${daysStr} ${hoursStr} ${minutesStr} ${secondsStr}`;
+}
+```
 
 ### 참고
 
