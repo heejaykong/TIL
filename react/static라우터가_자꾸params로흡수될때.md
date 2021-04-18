@@ -11,5 +11,4 @@ ClubManager 플젝을 하던 중, 라우터를 설정하는데...
 참고한 해결 방법: Use a Switch (which stops after the first match) and place the fixed path first. -> 즉 static한 애들이 먼저 적혀야 한다.
 
 ### 참고
-* [How to set the params react router not misunderstand with the static router?
-] (https://stackoverflow.com/questions/51110111/how-to-set-the-params-react-router-not-misunderstand-with-the-static-router)
+* [How to set the params react router not misunderstand with the static router?](https://stackoverflow.com/questions/51110111/how-to-set-the-params-react-router-not-misunderstand-with-the-static-router)
