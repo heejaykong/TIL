@@ -26,7 +26,7 @@
 
 `$ conda info --envs`
 
-3. 가상환경으로 들어갈 때
+3. 가상환경으로 들어갈 때(또는 나갈 때)
 
 `$ conda activate(또는 deactivate) 가상환경이름`
 
