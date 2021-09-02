@@ -30,7 +30,7 @@
 
 `$ conda activate(또는 deactivate) 가상환경이름`
 
-4. 특정 가상환경에 뭔갈 설치해야할 때(pandas라고 치면)
+4. 특정 가상환경에 뭔갈 설치해야할 때(pandas라고 가정하면)
 
 `$ conda install -n 가상환경이름 pandas`
 
