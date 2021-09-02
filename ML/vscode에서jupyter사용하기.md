@@ -43,7 +43,7 @@
 
 분명 Anaconda prompt로 numpy를 원하는 가상환경에 설치하고, 그 가상환경에서 vscode로 작업을 하는데 `import numpy`문에서 자꾸 다음과 같은 오류가 발생했다.
 
-`ImportError: DLL load failed: The file cannot be accessed by the system`
+`ImportError: 어쩌구....... DLL load failed: The file cannot be accessed by the system`
 
 구글링 끝에 **관리자로 Anaconda prompt를 실행**하면 해결된다는 것을 알았다.
 
