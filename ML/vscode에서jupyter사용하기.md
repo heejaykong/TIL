@@ -49,6 +49,14 @@
 
 Anaconda prompt를 관리자로 실행해, 해당 가상환경으로 들어가 numpy를 지우고 다시 설치하니 vscode에서 코드가 잘 작동했다.
 
+## (3) 위 방법이 안 될 때
+> To ensure the environment is set up well from a shell perspective, one option is to use an Anaconda prompt with the activated environment to launch VS Code using the `code .` command. At that point you just need to select the interpreter using the Command Palette or by clicking on the status bar.
+
+Anaconda prompt에서 작업하고자 하는 디렉토리로 들어가서 `code .` 로 vscode 실행시켜주고,
+
+Python Interpreter를 다시 지정해주니까 작동했음ㅠ 휴
+
 ### 참고
 * [[Anaconda] 아나콘다 가상환경의 개념 및 활용방법](https://yganalyst.github.io/pythonic/anaconda_env_1/)
 * [[파이썬 에러 해결 Tip] ImportError: DLL load failed: 시스템에서 파일에 액세스할 수 없습니다.](https://3rdscholar.tistory.com/81)
+* [Using Python environments in VS Code](https://code.visualstudio.com/docs/python/environments#_create-a-conda-environment)
