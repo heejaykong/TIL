@@ -50,16 +50,53 @@ image classification 딥러닝 튜토리얼들을 보니 데이터셋 전체가 
 다음과 같이 glob 함수를 이용해 모든 json파일을 담아왔고
 
 code TBD
+```
+# "라벨링데이터" 하위에 있는 모든 json파일 읽어오기 (참고: https://blr.design/blog/python-multiple-json-to-csv)
+base = "../../" # 다운받은 k-fashion 데이터셋으로 가는 기본 경로 정의
+train_label_files = glob(os.path.join(base, "k-fashion-dataset", "Training", "labels", "*", "*"), recursive=True)
+valid_label_files = glob(os.path.join(base, "k-fashion-dataset", "Validation", "labels", "*", "*"), recursive=True)
+```
 
 generate_csv_from_json_files() 이라는 커스텀 함수의 파라미터로 넣었다. 이러면 정해진 경로에 temp.csv라는, 전처리당할 준비가 된 csv파일이 저장된다
 
 code TBD
+```
+# 차례대로 해줘야 한다는 단점이...
+# rd.generate_csv_from_json_files(train_label_files[:100])
+rd.generate_csv_from_json_files(valid_label_files[:100])
+```
 
 image TBD(temp.csv 모습)
 
 그럼 generate_csv_from_json_files() 함수를 까보자
 
 code TBD
+```
+# 읽어온 각각의 json을 필요한 정보만 뽑아서 row 하나로 만들기
+def generate_csv_from_json_files(files):
+    data = []
+    for single_file in tqdm(files):
+        with open(single_file, 'r', encoding='utf-8') as f:
+            # Use 'try-except' to skip files that may be missing data
+            try:
+                json_file = json.load(f)
+                file_id = json_file["데이터셋 정보"]["파일 번호"]
+                file_name = json_file["데이터셋 정보"]["파일 이름"]
+                top = json_file["데이터셋 정보"]["데이터셋 상세설명"]["라벨링"]["상의"][0] # 상의만 가져올 것임
+                data.append([file_id, file_name, top])
+            except KeyError:
+                print(f'Skipping {single_file}')
+    # Add header
+    data.insert(0, ['ID', 'File Name', 'Top'])
+    print("\nREADING EACH JSON FILE ALL DONE! Length of data is", len(data))
+
+    # csv로 변환
+    print("Saving data as CSV file...")
+    with open(TEMP_CSV_PATH, "w", encoding='utf-8', newline="") as f:
+        writer = csv.writer(f)
+        writer.writerows(data)
+    print(f"CSV saved in {TEMP_CSV_PATH}")
+```
 
 line n의 루프문에서 각각의 json file마다 필요한 처리를 할 것이다.
 
@@ -71,14 +108,49 @@ data에 전부 append하고 나면 header를 삽입해주고, 이제 line n에�
 그렇게 저장된 임시파일인 temp.csv를 이제 본격적 전처리를 위해 불러와보자. json객체가 아예 통째로 저장됐기 때문에 literal_eval을 이용한다.
 
 code TBD
+```
+data = pd.read_csv(rd.TEMP_CSV_PATH,
+                    converters = {'Top': literal_eval},
+                    encoding='utf-8') # reading the csv file
+```
 
 불러온 dataframe을 reduce_data()라는 커스텀함수에 돌려보자.
+
+`reduced_data = rd.reduce_data(data)`
 
 이 함수는 json 객체를 일일이 칼럼으로 flatten시키고, 우리에게 필요한 칼럼만 남기고, 마지막으로 one-hot 인코딩까지 마친 dataframe을 리턴해준다
 
 제대로 까서 확인해보자
 
 code TBD
+```
+def reduce_data(csv):
+    # csv칼럼 내부 json 객체 flatten하기
+    # https://stackoverflow.com/questions/39899005/how-to-flatten-a-pandas-dataframe-with-some-columns-as-json
+    print("flattening columns...")
+    TOP = pd.json_normalize(csv["Top"])
+    flattened = csv[['ID', 'File Name']].join(TOP)
+
+    # 우리 모델에 필요한 칼럼만 남기기
+    print("dropping columns we don't need...")
+    dropped = flattened[['ID', 'File Name', '카테고리','소매기장']]
+
+    # one-hot 인코딩 하기
+    print("one-hot encoding...")
+    pd.set_option('display.max_columns', None)
+    targets = dropped.columns[2:]
+    final = pd.get_dummies(dropped, columns=targets, prefix_sep="_")
+
+    # 기존에 사용한 파일 이제 무쓸모니까 삭제하기
+    if(os.path.exists(TEMP_CSV_PATH) and os.path.isfile(TEMP_CSV_PATH)):
+        os.remove(TEMP_CSV_PATH)
+        print(f"{TEMP_CSV_PATH} file deleted")
+    else:
+        print(f"{TEMP_CSV_PATH} file not found")
+    
+    print("ALL DONE!")
+    return final
+```
 
 line n에서 json_normalize를 사용해 json객체 값들을 전부 칼럼으로 변환시켜줬고
 
@@ -98,6 +170,13 @@ image TBD
 save_csv()도 커스텀 함수인데, 별거 없다
 
 code TBD
+```
+def save_csv(csv, path):
+    csv.to_csv(path,
+                index = False,
+                encoding='utf-8-sig')
+    print(f"CSV Saved in {path}")
+```
 
 index 없이 저장하는 옵션, 그리고 한글 값이 포함돼있어서 저장할때 encoding 부분을 매번 신경쓰는 게 번거로워서 이것도 그냥 모듈화시켰다.
 
