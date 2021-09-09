@@ -79,7 +79,7 @@ __(116)IMG_1.jpg__
 <img src="https://user-images.githubusercontent.com/18097984/132459633-f87148e3-7c03-4102-b97d-af253cab48b3.jpg" alt="image" width="40%"/>
 
 __(116)IMG_1.json__
-```
+```json
 {
   "이미지 정보": {
     "이미지 식별자": 703911,
@@ -174,26 +174,23 @@ image classification 딥러닝 튜토리얼들을 보니 데이터셋 전체가 
 
 다음과 같이 glob 함수를 이용해 모든 json파일을 담아왔고
 
-```
+```python
 # "라벨링데이터" 하위에 있는 모든 json파일 읽어오기 (참고: https://blr.design/blog/python-multiple-json-to-csv)
 base = "../../" # 다운받은 k-fashion 데이터셋으로 가는 기본 경로 정의
 train_label_files = glob(os.path.join(base, "k-fashion-dataset", "Training", "labels", "*", "*"), recursive=True)
 valid_label_files = glob(os.path.join(base, "k-fashion-dataset", "Validation", "labels", "*", "*"), recursive=True)
 ```
 
-generate_csv_from_json_files() 이라는 커스텀 함수의 파라미터로 넣었다. 이러면 정해진 경로에 temp.csv라는, 전처리당할 준비가 된 csv파일이 저장된다
+`generate_csv_from_json_files()` 이라는 커스텀 함수의 파라미터로 넣었다. 이러면 정해진 경로에 temp.csv라는, 전처리당할 준비가 된 csv파일이 저장된다
 
+```python
+rd.generate_csv_from_json_files(train_label_files)
 ```
-# 차례대로 해줘야 한다는 단점이...
-# rd.generate_csv_from_json_files(train_label_files[:100])
-rd.generate_csv_from_json_files(valid_label_files[:100])
-```
+<img src="https://user-images.githubusercontent.com/18097984/132627140-f1da7e9f-6624-488e-a273-99dd8b29d7e3.png" width="70%" alt="screenshot" />
 
-image TBD(temp.csv 모습)
+그럼 `generate_csv_from_json_files()` 함수가 어떻게 생겼는지 까보자
 
-그럼 generate_csv_from_json_files() 함수를 까보자
-
-```
+```python
 # 읽어온 각각의 json을 필요한 정보만 뽑아서 row 하나로 만들기
 def generate_csv_from_json_files(files):
     data = []
@@ -220,30 +217,40 @@ def generate_csv_from_json_files(files):
     print(f"CSV saved in {TEMP_CSV_PATH}")
 ```
 
-line n의 루프문에서 각각의 json file마다 필요한 처리를 할 것이다.
+line 2의 루프문에서 각각의 json file마다 필요한 처리를 할 것이다.
 
-line n~ n까지는 우리에게 필요한 정보(image id, file name, 상의 관련 전체정보)를 각각 뽑아주고, 이를 data에 append한다.
+line 7~12까지는 우리에게 필요한 정보(image id, file name, 상의 관련 전체정보)를 각각 뽑아주고, 이를 data에 append한다.
 
-data에 전부 append하고 나면 header를 삽입해주고, 이제 line n에서 정해진 경로에 임시적으로 data를 csv파일로 만들어 저장시킨다.
+data에 전부 append하고 나면 header를 삽입해주고, 이제 line 21에서 정해진 경로에 임시적으로 data를 csv파일로 만들어 저장시킨다.
 
 
-그렇게 저장된 임시파일인 temp.csv를 이제 본격적 전처리를 위해 불러와보자. json객체가 아예 통째로 저장됐기 때문에 literal_eval을 이용한다.
+그렇게 저장된 임시파일인 temp.csv를 확인해보자. json객체가 아예 통째로 저장된 상태이기 때문에 literal_eval을 이용해서 불러온다.
 
-```
+```python
 data = pd.read_csv(rd.TEMP_CSV_PATH,
                     converters = {'Top': literal_eval},
                     encoding='utf-8') # reading the csv file
+data
 ```
 
-불러온 dataframe을 reduce_data()라는 커스텀함수에 돌려보자.
+<img src="https://user-images.githubusercontent.com/18097984/132625515-17334b5b-e0fe-49bf-a437-a407d9f01987.png" width="75%" alt="screenshot"/>
 
-`reduced_data = rd.reduce_data(data)`
+이렇게 생겼다. Top이라는 칼럼 안에 json객체가 통째로 들어있는 것을 볼 수 있다.
+
+그러면 이제 불러온 이 dataframe을 `reduce_data()`라는 커스텀함수에 또 돌려보자.
 
 이 함수는 json 객체를 일일이 칼럼으로 flatten시키고, 우리에게 필요한 칼럼만 남기고, 마지막으로 one-hot 인코딩까지 마친 dataframe을 리턴해준다
 
-제대로 까서 확인해보자
 
+```python
+reduced_data = rd.reduce_data(data)
 ```
+
+<img src="https://user-images.githubusercontent.com/18097984/132627817-07245f4d-8e83-4f38-98e6-dddaa9da1dea.png" width="70%" alt="screenshot" />
+
+넘어가기 전에 함수가 어떻게 생겨먹었는지 들여다보자
+
+```python
 def reduce_data(csv):
     # csv칼럼 내부 json 객체 flatten하기
     # https://stackoverflow.com/questions/39899005/how-to-flatten-a-pandas-dataframe-with-some-columns-as-json
@@ -272,24 +279,32 @@ def reduce_data(csv):
     return final
 ```
 
-line n에서 json_normalize를 사용해 json객체 값들을 전부 칼럼으로 변환시켜줬고
+line 5에서 json_normalize를 사용해 json객체 값들을 전부 칼럼으로 변환시켜줬고
 
-line n에서 우리에게 필요한 칼럼들(카태고리, 소매기장)만 남긴 dropped라는 dataframe을 만들었다. 날씨와 코디를 연관시키려면 긴팔 블라우스, 처럼 소매기장과 카테고리만 있으면 될 것 같았다.
+line 10에서 우리에게 필요한 칼럼들(카태고리, 소매기장)만 남긴 dropped라는 dataframe을 만들었다. 날씨와 코디를 연관시키려면 긴팔 블라우스, 처럼 소매기장과 카테고리만 있으면 될 것 같았다.
 
-line n에서 pandas의 get_dummies 함수를 사용해 one-hot 인코딩을 진행했다. 이러면 이제 범주형 데이터가 아닌 0과 1로만 값이 이뤄지는 데이터셋이 되므로,classification으로써 학습시킬 수 있게 된다.
+line 16에서 pandas의 get_dummies 함수를 사용해 one-hot 인코딩을 진행했다. 이러면 이제 범주형 데이터가 아닌 0과 1로만 값이 이뤄지는 데이터셋이 되므로, classification으로써 학습시킬 수 있게 된다.
 
-line n~n는 더이상 필요 없어진 기존의 temp.csv를 삭제하는 코드다
+line 18~23는 더이상 필요 없어진 기존의 temp.csv 파일을 삭제하는 코드다
 
 
-짠 그리하여 생성된 최종 모습을 봐보자
+짠~ 그리하여 생성된 최종 모습을 봐보자
 
 image TBD
+![image](https://user-images.githubusercontent.com/18097984/132628097-f96126d2-fedd-47bb-9497-fc4b77149409.png)
 
-크게 두 단계로 나눠진 전처리과정 중 첫번째 단계를 마친 이 각각의 train, valid 데이터셋을 원하는 경로에 저장해주자. 나는 raw_{데이터명}.csv라는 이름으로 저장했다.
+여기까지가 train 데이터셋의 처리 과정이었다. 이와 똑같은 과정을 valid 데이터셋에게도 똑같이 진행한다.
+
+첫번째 전처리를 마친 이 각각의 train, valid 데이터셋을 원하는 경로에 저장해주자. 나는 raw_{데이터명}.csv라는 이름으로 저장했다.
+
+```python
+raw_train_path = os.path.join("..", "input", "raw_train.csv")
+rd.save_csv(reduced_data, raw_train_path)
+```
+<img src="https://user-images.githubusercontent.com/18097984/132629556-9c6d07fc-baff-4acf-a4f2-1909f0ab2440.png" width="75%" alt="screenshot" />
 
 save_csv()도 커스텀 함수인데, 별거 없다
-
-```
+```python
 def save_csv(csv, path):
     csv.to_csv(path,
                 index = False,
@@ -297,11 +312,12 @@ def save_csv(csv, path):
     print(f"CSV Saved in {path}")
 ```
 
-index 없이 저장하는 옵션, 그리고 한글 값이 포함돼있어서 저장할때 encoding 부분을 매번 신경쓰는 게 번거로워서 이것도 그냥 모듈화시켰다.
+index 없이 저장하는 옵션, 그리고 한글 값이 포함돼있어서 저장할때 encoding하는 옵션을 매번 신경쓰는 게 번거로워서 그냥 모듈화시켰다.
 
+### 마무리
 
-이번 글에서는 K-Fashion 이미지 데이터셋을 우리의 목표에 알맞은 정보들만 빼내서 담아내는 자칭 "Data Reduction" 과정을 살펴보았다.
+이번 글에서는 K-Fashion 이미지 데이터셋을 우리의 목표에 알맞은 정보들만 빼내서 담아내는 자칭 **"Data Reduction"** 과정을 살펴보았다.
 
-다음 글에서는 본격적으로 오염된 데이터들을 걸러내는 "Data Cleaning" 과정을 알아보자.
+다음 글에서는 본격적으로 오염된 데이터들을 걸러내는 **"Data Cleaning"** 과정을 알아보자.
 
 끝
