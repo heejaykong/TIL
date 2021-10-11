@@ -307,6 +307,8 @@ def save_csv(csv, path):
 
 이와 똑같은 과정을 Validation 폴더 아래의 데이터에게도 진행하면 train과 valid 데이터셋 준비가 각각 완료된다.
 
+<img src="https://user-images.githubusercontent.com/18097984/136834983-625c3f8c-e433-431c-95f2-da34c2b34e0c.png" width="25%" alt="screenshot" />
+
 *생성된 각각의 데이터셋 파일*
 
 
