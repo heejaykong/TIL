@@ -314,7 +314,90 @@ def save_csv(csv, path):
 
 ## 3. 전체 코드 및 마무리
 
-위 설명에 나온 script들을 포함한 **전체 코드**는 [이곳]()을 참고하길 바란다.
+위 설명에 나온 script들을 포함한 **전체 코드**를 덧붙이며 마무리하고자 한다.
+
+```python
+# 1._data_cleaning.ipynb
+```
+```python
+from tqdm import tqdm
+from glob import glob
+import pandas as pd
+import json
+import csv
+import os
+```
+```python
+# 읽어온 각각의 json을 필요한 정보만 뽑아서 row 하나로 만들기
+def generate_csv_from_json_files(files):
+    TEMP_CSV_PATH = "temp.csv"
+    data = []
+    for single_file in tqdm(files):
+        with open(single_file, 'r', encoding='utf-8') as f:
+            # Use 'try-except' to skip files that may be missing data
+            try:
+                json_file = json.load(f)
+                file_id = json_file["데이터셋 정보"]["파일 번호"]
+                file_name = json_file["데이터셋 정보"]["파일 이름"]
+                category = json_file["데이터셋 정보"]["데이터셋 상세설명"]["라벨링"]["상의"][0]["카테고리"]
+                sleeve_length = json_file["데이터셋 정보"]["데이터셋 상세설명"]["라벨링"]["상의"][0]["소매기장"]
+                data.append([file_id, file_name, category, sleeve_length])
+            except KeyError:
+                continue
+    # Add header
+    data.insert(0, ['id', 'file_name', 'category', 'sleeve_length'])
+    print("\nREADING EACH JSON FILE ALL DONE! Length of data is", len(data))
+
+    # csv로 변환
+    print("Saving data as CSV file...")
+    with open(TEMP_CSV_PATH, "w", encoding='utf-8', newline="") as f:
+        writer = csv.writer(f)
+        writer.writerows(data)
+    print(f"CSV saved in {TEMP_CSV_PATH}")
+
+    # one-hot 인코딩 하기
+    csv_file = pd.read_csv(TEMP_CSV_PATH, encoding='utf-8') # reading the saved csv file
+    print("one-hot encoding...")
+    targets = csv_file.columns[2:]
+    final = pd.get_dummies(csv_file, columns=targets, prefix="", prefix_sep="")
+
+    # 기존에 사용한 파일 이제 무쓸모니까 삭제하기
+    if(os.path.exists(TEMP_CSV_PATH) and os.path.isfile(TEMP_CSV_PATH)):
+        os.remove(TEMP_CSV_PATH)
+        print(f"{TEMP_CSV_PATH} file deleted")
+    else:
+        print(f"{TEMP_CSV_PATH} file not found")
+    
+    print("ALL DONE!")
+    return final
+```
+```python
+def save_csv(csv, path):
+    csv.to_csv(path,
+                index = False,
+                encoding='utf-8-sig')
+    print(f"CSV Saved in {path}")
+```
+```python
+# "라벨링데이터" 하위에 있는 모든 json파일 읽어오기
+base = "../../../"
+
+train_label_files = glob(os.path.join(base, "k-fashion-dataset", "Training", "labels", "*", "*"), recursive=True)
+reduced_train = generate_csv_from_json_files(train_label_files)
+
+RAW_TRAIN_PATH = os.path.join("..", "..", "input", "raw_train.csv")
+save_csv(reduced_train, RAW_TRAIN_PATH)
+```
+```python
+valid_label_files = glob(os.path.join(base, "k-fashion-dataset", "Validation", "labels", "*", "*"), recursive=True)
+reduced_valid = generate_csv_from_json_files(valid_label_files)
+
+RAW_VALID_PATH = os.path.join("..", "..", "input", "raw_valid.csv")
+save_csv(reduced_valid, RAW_VALID_PATH)
+```
+```python
+# To be continued... (2._data_cleaning.ipynb)
+```
 
 이번 글에서는 K-Fashion 이미지 데이터셋을 우리의 목표에 알맞은 정보들만 빼서 담아내는 자칭 **"1. Data Reduction"** 과정을 살펴보았다.
 
