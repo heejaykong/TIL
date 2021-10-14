@@ -58,6 +58,8 @@
 
 (파일명이 동일해도 확장자가 다를 경우 다른 string으로 인식되니까) 전처리 편의성을 위해, 확장자들을 `.jpg`로 통일시키기로 했다.
 
+먼저, 기존의 `raw_train` 파일을 읽어온 뒤, `replace_extensions()` 함수에 넣었다.
+
 ```python
 # reading the csv file
 base = "../../input/"
@@ -69,8 +71,6 @@ print(len(raw_train))
 
 *실행결과 `raw_train`의 데이터 수는 총 415,707개다*
 
-먼저, 위처럼 기존의 `raw_train` 파일을 읽어온 뒤, 아래처럼 `replace_extensions()` 함수에 넣었다.
-
 ```python
 raw_train = replace_extensions(raw_train)
 ```
@@ -79,7 +79,7 @@ raw_train = replace_extensions(raw_train)
 
 <div style="display:flex;">
   <img src="https://user-images.githubusercontent.com/18097984/136966095-7e44fbbc-c29f-4e2d-befb-66a1d729d657.png" width="45%" alt="screenshot" />
-  >>>
+  =>
   <img src="https://user-images.githubusercontent.com/18097984/136966505-35f82787-2f47-40b7-8205-11da5cdabfe9.png" width="45%" alt="screenshot" />
 </div>
 
@@ -101,7 +101,11 @@ def replace_extensions(csv):
 
 ### 2) 중복 및 모호한 데이터 걸러내기
 
-아예 identical한 중복된 데이터가 존재하거나, 모호한 경우의 데이터를 발견했다.
+이번엔 중복되거나 모호한 값을 지닌, 오염된 데이터들을 걸러내는 작업을 할 차례다.
+
+위 예시 이미지처럼 아예 **파일명과 라벨링값이 동일한 데이터들**이 존재하기도 했고,
+
+**파일명은 같은데 다르게 라벨링된 데이터들**이 존재하기도 했다.
 
 `remove_duplicate_rows()`와 `remove_ambiguous_rows()`라는 함수의 파라미터로 넣어 처리했다.
 
@@ -143,8 +147,7 @@ def remove_ambiguous_rows(csv):
 `raw_valid`에도 여태 얘기한 전처리 코드를 똑같이 진행한 뒤 넘어갔는데 뭔가 이상하길래,
 
 ```python
-# train과 valid 사이에는 서로 겹치는 데이터가 없는지 확인
-# (train과 valid 각각의 내부에는 내가 전처리 해놔서 겹치는 데이터가 없는 게 보장된 상태)
+# 이미 처리한 train과 valid 사이에는 서로 겹치는 데이터가 없는지 확인
 filenames = TOTAL['file_name'].tolist()
 seen = set()
 uniq = []
@@ -155,7 +158,7 @@ for names in filenames:
         uniq.append(names)
     else:
         duplicates.append(names)
-len(duplicates) # 졸라 많은 것으로 판명
+len(duplicates) # 짱 많은 것으로 판명
 ```
 
 삽질 끝에 또!! train과 valid 데이터셋 사이에 중복되는 값이 존재한다는 것을 뒤늦게 깨달았다.
@@ -164,7 +167,7 @@ len(duplicates) # 졸라 많은 것으로 판명
 
 이럴 거면 왜 굳이 이렇게 구분해서 배포했는지 모르겠다... 괜히 전처리 과정만 번거로워진다.
 
-아무튼 그래서 겹치는 데이터를 제거하기 위해, 아래와 같이 `raw_train`과 `raw_valid`을 우선 합친 뒤, 어떻게 처리할지 결정하려고 직접 데이터를 확인해봤다.
+아무튼 그래서 겹치는 데이터를 제거하기 위해, 아래와 같이 `raw_train`과 `raw_valid`을 우선 합친 뒤, 어떻게 처리할지 결정하려고 직접 데이터 테이블을 확인해봤다.
 
 ```python
 total_data = pd.concat([raw_train, raw_valid])
