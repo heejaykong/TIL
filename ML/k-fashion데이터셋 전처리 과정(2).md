@@ -103,11 +103,16 @@ def replace_extensions(csv):
 
 이번엔 중복되거나 모호한 값을 지닌, 오염된 데이터들을 걸러내는 작업을 할 차례다.
 
+
+![image](https://user-images.githubusercontent.com/18097984/137441058-463094a8-23c5-4d1d-b1fd-3554807a5122.png)
+
 위 예시 이미지처럼 아예 **파일명과 라벨링값이 동일한 데이터들**이 존재하기도 했고,
 
-**파일명은 같은데 다르게 라벨링된 데이터들**이 존재하기도 했다.
+![image](https://user-images.githubusercontent.com/18097984/137440983-59359fae-be24-4062-9006-5b76961b91ba.png)
 
-`remove_duplicate_rows()`와 `remove_ambiguous_rows()`라는 함수의 파라미터로 넣어 처리했다.
+또는 위처럼 **파일명은 같은데 다르게 라벨링된 데이터들**이 존재하기도 했다.
+
+각 유형마다 `remove_duplicate_rows()`와 `remove_ambiguous_rows()`라는 함수의 파라미터로 넣어 처리했다.
 
 ```python
 raw_train = remove_duplicate_rows(raw_train)
@@ -142,24 +147,9 @@ def remove_ambiguous_rows(csv):
 
 ### 3) train과 valid 사이 중복 데이터 또 걸러내기
 
-끝난 줄 알았더니 또 다른 문제를 발견했다.
+데이터전처리가 끝난 줄 알았더니 또 다른 문제를 발견했다.
 
-`raw_valid`에도 여태 얘기한 전처리 코드를 똑같이 진행한 뒤 넘어갔는데 뭔가 이상하길래,
-
-```python
-# 이미 처리한 train과 valid 사이에는 서로 겹치는 데이터가 없는지 확인
-filenames = TOTAL['file_name'].tolist()
-seen = set()
-uniq = []
-duplicates = []
-for names in filenames:
-    if names not in seen:
-        seen.add(names)
-        uniq.append(names)
-    else:
-        duplicates.append(names)
-len(duplicates) # 짱 많은 것으로 판명
-```
+앞서 2)번에서 진행한 전처리코드를 `raw_valid` 테이블에도 똑같이 진행한 뒤 다음 단계로 넘어가려는데 뭔가 이상하길래,
 
 삽질 끝에 또!! train과 valid 데이터셋 사이에 중복되는 값이 존재한다는 것을 뒤늦게 깨달았다.
 
@@ -167,43 +157,87 @@ len(duplicates) # 짱 많은 것으로 판명
 
 이럴 거면 왜 굳이 이렇게 구분해서 배포했는지 모르겠다... 괜히 전처리 과정만 번거로워진다.
 
-아무튼 그래서 겹치는 데이터를 제거하기 위해, 아래와 같이 `raw_train`과 `raw_valid`을 우선 합친 뒤, 어떻게 처리할지 결정하려고 직접 데이터 테이블을 확인해봤다.
+아무튼 어떤 데이터가 겹치는지는 아래 코드처럼 먼저 두 테이블을 합친 뒤, set을 활용해 확인해봤다.
 
 ```python
 total_data = pd.concat([raw_train, raw_valid])
-len(total_data)
+len(total_data)           # 409,470(raw_train) + 67,472(raw_valid) = 총 476,942개
 
-# 겹치는 데이터들을 troubles로 명명... 어떻게 처리할지 결정하기 위해 눈으로 직접 데이터 확인
-troubles = total_data.loc[total_data['file_name'].isin(duplicates)]
-sorted_troubles = troubles.sort_values(['file_name', 'id'], ascending=[True, True]) # 파일명, ID값대로 정렬 후 저장
+filenames = total_data['file_name'].tolist()
+seen = set()
+uniq = []
+duplicate_filenames = []
+for names in filenames:
+    if names not in seen:
+        seen.add(names)
+        uniq.append(names)
+    else:
+        duplicate_filenames.append(names)
+len(duplicate_filenames)  # 파일명이 겹치는 데이터가 2,645개나 있던 것으로 판명
+```
+
+`duplicate_filenames`을 어떻게 처리할지 결정하기 위해 눈으로 직접 데이터를 확인해봤다.
+
+```python
+troubles = total_data.loc[total_data['file_name'].isin(duplicate_filenames)] # 겹치는 데이터들을 troubles로 명명...
+sorted_troubles = troubles.sort_values(['file_name', 'id'], ascending=[True, True]) # 파일명, id 값대로 정렬 후 저장
 save_csv(sorted_troubles, "troubles.csv")
 ```
-image TBD
+
+![image](https://user-images.githubusercontent.com/18097984/137461265-b3ab43bb-2967-4d11-a83d-edc9e336ec11.png)
 
 *troubles.csv*
 
+역시나 이전의 전처리하던 것과 마찬가지로 대부분 **중복 데이터**(`1유형`이라고 하자) 또는 **같은 이미지를 다르게 평가한 데이터들**(`2유형`이라고 하자)이었다.
+
+`2유형`의 데이터들을 앞서 `remove_ambiguous_rows()`으로 처리했던 것처럼 전부 지워버릴 수 있었지만, 자세히 보니 뭔가 패턴이 보였다.
+
+주로 맨 마지막에 오는 id 를 가진 데이터가 제대로 평가된 데이터인 것 같아 보였다.
+
+예를 들어 troubles.csv 이미지의 68, 69번째 줄에 나타난 데이터를 보면 먼저 티셔츠, 그 다음은 블라우스로 평가되어 있는데,
+
+해당되는 이미지를 직접 확인해보니 블라우스가 더 적합해 보였다.
+
+<img src="https://user-images.githubusercontent.com/18097984/137462076-fafeb517-e70e-478c-a44e-434d214b9456.JPG" width="40%" alt="example" />
+
+*파일명 1 (26975).jpg 해당 이미지*
+
+`2유형`에 해당하는 나머지 데이터들도 마저 확인해보니 전부 비슷했다: **중복 데이터 중 id 기준으로 정렬했을 시, 맨 마지막 데이터가 옳은 데이터였다.**
+
+따라서 이번만큼은 `total_data`를 `remove_duplicate_rows()`나 `remove_ambiguous_rows()`으로 처리하지 않고 다음과 같이 처리했다.
+
 ```python
 # 엑셀파일과 이미지들을 직접 확인해본 결과...
-# 파일명이 겹치는 데이터들 중 나중에 온 ID값을 살리면 되겠다고 판단.
-sorted_total = total_data.sort_values(['file_name', 'ID'], ascending=[True, True])
+# 파일명이 겹치는 데이터들 중 나중에 온 id값 데이터를 살리면 되겠다고 판단.
+sorted_total = total_data.sort_values(['file_name', 'id'], ascending=[True, True])
 total_without_duplicates = sorted_total.drop_duplicates(subset=['file_name'], keep='last')
-len(total_without_duplicates)
+len(total_without_duplicates)   # 총 474,297개
 ```
 
+*(어쩌면 `raw_train`과 `raw_valid`를 처리할때도 `remove_duplicate_rows()`나 `remove_ambiguous_rows()`필요 없이 위 코드 하나로 끝낼 수도 있었다.)*
+
 ```python
-save_csv(total_without_duplicates, "../../input/preprocessed_TOTAL_dataset.csv")
+# 파일로 저장
+save_csv(total_without_duplicates, os.path.join(base, "preprocessed_total_dataset.csv"))
 ```
 
+**전처리 과정이 드디어 끝났다!**
 
-그 다음엔 정말로 이 데이터셋에 나온 파일명 중 누락된 이미지 또한 없는지 확인한다
+### +) 누락된 이미지는 없는지 검토하기
+
+그 다음엔 정말로 이 데이터셋에 나온 파일명에 해당하는 이미지 중 누락된 이미지는 없는지 검토해보자.
 
 ```python
+TARGET_PATH = os.path.join(base, "ALL_IMAGES/") # 모든 원천데이터(=이미지파일)가 담긴 폴더 경로
 data = total_without_duplicates
 filenames = data['file_name'].tolist()
-target_path = os.path.join("..", "..", "input", "ALL_IMAGES/") # 모든 원천데이터(=이미지파일)가 담긴 폴더 경로
-candidates = [target_path + name for name in filenames]
-len(candidates)
+candidates = [TARGET_PATH + name for name in filenames] # 파일명에 해당하는 이미지들 전부 담기
 ```
+
+<img src="https://user-images.githubusercontent.com/18097984/137468472-a0557a3d-dbe3-4c53-bb12-fc3ffcf67c84.png" width="45%" alt="screenshot" />
+
+*`candidates`가 어떻게 생겼는지 살짝 보자면 이렇다.*
+
 ```python
 data_without_images = []
 for path in tqdm(candidates):
@@ -211,17 +245,143 @@ for path in tqdm(candidates):
     if not isExist:
         print("OH NO.")
         data_without_images.append(path)
-    else:
-        print("clear!")
+print("done!")
 ```
 
-실행결과 이미지 TBD
+<img src="https://user-images.githubusercontent.com/18097984/137481579-a50792e3-315e-4c83-9991-08f9567c454f.png" width="45%" alt="screenshot" />
 
 *실행 결과 다행히 누락된 이미지는 없는 것으로 보인다.*
 
-Now we are REALLY good to go!!!!
+## 3. 전체코드 및 마무리
 
-이제 전처리 과정을 다 마쳤으니 본격적으로 train, valid, test 데이터셋으로 각자 쪼개는 작업을 진행해보자.
+여태 이야기한 코드들을 전부 포함한 전체 코드를 첨부하며 마무리한다.
+
+```python
+from glob import glob
+from shutil import copy
+from tqdm import tqdm
+import pandas as pd
+import os
+```
+
+```python
+# 파일명과 라벨들이 duplicate인 row마다 마지막 하나만 살리고 다 없애기
+def remove_duplicate_rows(csv):
+    cols = list(csv.columns[1:])
+    duplicates_removed = csv.drop_duplicates(subset=cols, keep='last')
+    return duplicates_removed
+```
+
+```python
+# 파일명만 duplicate하고 라벨은 달라서 모호한 row들은 전부 없애버리기
+def remove_ambiguous_rows(csv):
+    ambiguous_removed = csv.drop_duplicates(subset=['file_name'], keep=False)
+    return ambiguous_removed
+```
+
+```python
+# 파일명 확장자 통일시키기(.jpg, .JPG만 다르고 파일명 같은놈들 있음 하)
+def to_jpg(filename):
+    return os.path.splitext(filename)[0] + ".jpg"
+
+def replace_extensions(csv):
+    csv.loc[:,"file_name"] = csv.loc[:,"file_name"].apply(to_jpg)
+    return csv
+```
+
+```python
+# 파일로 저장하기
+def save_csv(csv, path):
+    csv.to_csv(path,
+               index = False,
+               encoding='utf-8-sig')
+    print(f"CSV Saved in {path}")
+```
+
+```python
+base = "../../input/"
+RAW_TRAIN_PATH = os.path.join(base, "raw_train.csv")
+RAW_VALID_PATH = os.path.join(base, "raw_valid.csv")
+
+# reading the csv file
+raw_train = pd.read_csv(RAW_TRAIN_PATH, encoding="utf-8")
+raw_valid = pd.read_csv(RAW_VALID_PATH, encoding="utf-8")
+
+print(len(raw_train), len(raw_valid))
+```
+
+```python
+raw_train = replace_extensions(raw_train)
+raw_train = remove_duplicate_rows(raw_train)
+raw_train = remove_ambiguous_rows(raw_train)
+
+raw_valid = replace_extensions(raw_valid)
+raw_valid = remove_duplicate_rows(raw_valid)
+raw_valid = remove_ambiguous_rows(raw_valid)
+
+print(len(raw_train), len(raw_valid))
+```
+
+```python
+total_data = pd.concat([raw_train, raw_valid])
+len(total_data)
+```
+
+```python
+# train과 valid 사이에는 서로 겹치는 데이터가 없는지 확인
+# (train과 valid 각각의 내부에는 내가 전처리 해놔서 겹치는 데이터가 없는 게 보장된 상태)
+filenames = total_data['file_name'].tolist()
+seen = set()
+uniq = []
+duplicate_filenames = []
+for names in filenames:
+    if names not in seen:
+        seen.add(names)
+        uniq.append(names)
+    else:
+        duplicate_filenames.append(names)
+len(duplicate_filenames) # 졸라 많은 것으로 판명
+```
+
+```python
+troubles = total_data.loc[total_data['file_name'].isin(duplicate_filenames)] # 겹치는 데이터들을 troubles로 명명...
+sorted_troubles = troubles.sort_values(['file_name', 'id'], ascending=[True, True]) # 파일명, id 값대로 정렬 후 저장
+save_csv(sorted_troubles, "troubles.csv")
+```
+
+```python
+# 엑셀파일과 이미지들을 직접 확인해본 결과...
+# 파일명이 겹치는 데이터들 중 나중에 온 id값 데이터를 살리면 되겠다고 판단.
+sorted_total = total_data.sort_values(['file_name', 'id'], ascending=[True, True])
+total_without_duplicates = sorted_total.drop_duplicates(subset=['file_name'], keep='last')
+len(total_without_duplicates)
+
+# 다시 파일로 저장
+save_csv(total_without_duplicates, os.path.join(base, "preprocessed_total_dataset.csv"))
+```
+
+```python
+# 누락된 이미지는 없는지 검토하기
+TARGET_PATH = os.path.join(base, "ALL_IMAGES/") # 모든 원천데이터(=이미지파일)가 담긴 폴더 경로
+data = total_without_duplicates
+filenames = data['file_name'].tolist()
+candidates = [TARGET_PATH + name for name in filenames] # 파일명에 해당하는 이미지들 전부 담기
+len(candidates)
+```
+
+```python
+data_without_images = []
+for path in tqdm(candidates):
+    isExist = os.path.exists(path)
+    if not isExist:
+        print("OH NO.")
+        data_without_images.append(path)
+print("done!")
+```
+
+**Now we are REALLY good to go!!!!**
+
+중간에 예상치 못한 문제를 해결하느라 애먹었지만, 이제 전처리 과정을 다 마쳤으니 본격적으로 train, valid, test 데이터셋으로 각자 쪼개는 작업을 진행해보자.
 
 끝
 
