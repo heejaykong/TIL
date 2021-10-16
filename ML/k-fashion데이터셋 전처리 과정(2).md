@@ -379,6 +379,10 @@ for path in tqdm(candidates):
 print("done!")
 ```
 
+```python
+# To be continued... (3._generate_train_valid_test.ipynb)
+```
+
 **Now we are REALLY good to go!!!!**
 
 중간에 예상치 못한 문제를 해결하느라 애먹었지만, 이제 전처리 과정을 다 마쳤으니 본격적으로 train, valid, test 데이터셋으로 각자 쪼개는 작업을 진행해보자.
