@@ -221,6 +221,8 @@ len(total_without_duplicates)   # 총 474,297개
 save_csv(total_without_duplicates, os.path.join(base, "preprocessed_total_dataset.csv"))
 ```
 
+<img src="https://user-images.githubusercontent.com/18097984/137585368-2aa2f47d-290c-4480-987b-1c1ce19ee6aa.png" width="35%" alt="screenshot" />
+
 **전처리 과정이 드디어 끝났다!**
 
 ### +) 누락된 이미지는 없는지 검토하기
