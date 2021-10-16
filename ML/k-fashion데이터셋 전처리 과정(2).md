@@ -257,8 +257,6 @@ print("done!")
 여태 이야기한 코드들을 전부 포함한 전체 코드를 첨부하며 마무리한다.
 
 ```python
-from glob import glob
-from shutil import copy
 from tqdm import tqdm
 import pandas as pd
 import os
