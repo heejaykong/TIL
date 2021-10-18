@@ -40,6 +40,88 @@
 
 ## 3. 전체코드 및 마무리
 
+전체코드는 다음과 같다.
+
+```python
+import os
+import pandas as pd
+```
+
+```python
+# 각각 원하는 크기로 sub dataset 랜덤으로 뽑아내기
+def randomlySplitToDatasets(csv, TRAIN_SIZE, VALID_SIZE, TEST_SIZE):
+    TRAIN_SIZE = TRAIN_SIZE
+    VALID_SIZE = VALID_SIZE
+    TEST_SIZE = TEST_SIZE
+    TOTAL_SIZE = TRAIN_SIZE + VALID_SIZE + TEST_SIZE
+
+    total_samples = csv.sample(n=TOTAL_SIZE) # 겹치지 않게 랜덤셀렉
+
+    train = total_samples[:TRAIN_SIZE]
+    valid = total_samples[TRAIN_SIZE : TRAIN_SIZE + VALID_SIZE]
+    test = total_samples[TRAIN_SIZE + VALID_SIZE:]
+    
+    print(len(train), len(valid), len(test))
+    return [train, valid, test]
+```
+
+```python
+def showDistribution(csv):
+    # '카테고리'와 '소매기장' 칼럼들을 다루기 위해 우선 칼럼명을 각각 list에 넣어준다
+    classes = list(csv.columns[2:])
+    categories = classes[:7]
+    sleeves = classes[7:]
+    
+    # '카테고리'(니트웨어, 브라탑, 블라우스, 셔츠...)와 '소매기장'(긴팔, 7부, 반팔...) 칼럼으로
+    # 만들 수 있는 모든 조합을 각각 sub dataframe으로 만들어 list에 저장한다.
+    DATAFRAME_ARR = []
+    combinations = []
+    for i, category in enumerate(categories):
+        for j, sleeve in enumerate(sleeves):
+            combinations.append(sleeve + " " + category)
+            sub = csv[(csv[sleeve] == 1) & (csv[category] == 1)]
+            DATAFRAME_ARR.append(sub)
+    
+    for i, DATAFRAME in enumerate(DATAFRAME_ARR):
+#         print(combinations[i], ":", len(DATAFRAME))
+        print('{:10}'.format(combinations[i]), ":", len(DATAFRAME))
+```
+
+```python
+# 파일로 저장하기
+def save_csv(csv, path):
+    csv.to_csv(path, index = False, encoding="utf-8-sig")
+    print("csv file is saved in", path)
+```
+
+```python
+base = "../../input/"
+csv = os.path.join(base, "preprocessed_total_dataset.csv")
+data = pd.read_csv(csv, encoding='utf-8')
+print(len(data))
+```
+
+```python
+train, valid, test = randomlySplitToDatasets(data, 30000, 10000, 10000)
+# showDistribution(test)
+# showDistribution(valid)
+# showDistribution(test)
+```
+
+```python
+TRAIN_PATH = os.path.join(base, "train_data.csv")
+VALID_PATH = os.path.join(base, "valid_data.csv")
+TEST_PATH = os.path.join(base, "test_data.csv")
+
+save_csv(train, TRAIN_PATH)
+save_csv(valid, VALID_PATH)
+save_csv(test, TEST_PATH)
+```
+
+```python
+# To be continued... (4._image_move.ipynb)
+```
+
 ### 참고
 * []()
 * []()
