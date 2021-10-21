@@ -2,6 +2,11 @@
 
 # defer script vs. async script
 
+### TL;DR
+> * DOM을 따라 반드시 순서대로 실행되어야 한다면 <script>
+> * DOM이나 다른 스크립트에 의존성이 없고, 실행 순서가 중요하지 않은 경우라면 <script async>
+> * DOM이나 다른 스크립트에 의존성이 있고, 실행 순서가 중요한 경우라면 <script defer>
+
 `<script>` 태그에는 `defer`와 `async` 라는 attribute가 있다.
 
 파서가 `<script>` 태그를 만나면 **하던 html 문서의 파싱은 멈추고 즉시 `<script>` 태그를 파싱하고 실행**한다.
@@ -25,3 +30,4 @@
 ### 참고
 * [브라우저는 어떻게 동작하는가?](https://d2.naver.com/helloworld/59361)
 * [defer, async 스크립트](https://ko.javascript.info/script-async-defer)
+* [스크립트의 실행 시점을 조절하는 Async와 Defer 속성](https://wormwlrm.github.io/2021/03/01/Async-Defer-Attributes-of-Script-Tag.html)
