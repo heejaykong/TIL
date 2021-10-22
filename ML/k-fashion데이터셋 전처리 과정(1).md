@@ -6,6 +6,16 @@ AI 허브에서 구한 [K-Fashion 이미지 데이터셋](https://aihub.or.kr/ai
 
 ## 1. 배경설명
 
+> 포스트 순서:
+> 
+> [K-Fashion 이미지 데이터셋을 전처리해 보자 (1) - Data Reduction 편](https://github.com/heejaykong/TIL/edit/main/ML/k-fashion%EB%8D%B0%EC%9D%B4%ED%84%B0%EC%85%8B%20%EC%A0%84%EC%B2%98%EB%A6%AC%20%EA%B3%BC%EC%A0%95(1).md) <- You are here
+> 
+> [K-Fashion 이미지 데이터셋을 전처리해 보자 (2) - Data Cleaning 편](https://github.com/heejaykong/TIL/blob/main/ML/k-fashion%EB%8D%B0%EC%9D%B4%ED%84%B0%EC%85%8B%20%EC%A0%84%EC%B2%98%EB%A6%AC%20%EA%B3%BC%EC%A0%95(2).md)
+> 
+> [K-Fashion 이미지 데이터셋을 전처리해 보자 (3) - Generate Train, Validation, Test 편](https://github.com/heejaykong/TIL/blob/main/ML/k-fashion%EB%8D%B0%EC%9D%B4%ED%84%B0%EC%85%8B%20%EC%A0%84%EC%B2%98%EB%A6%AC%20%EA%B3%BC%EC%A0%95(3).md)
+> 
+> [K-Fashion 이미지 데이터셋을 전처리해 보자 (4) - Move Image 편]()
+
 졸업작품으로 딥러닝 모델로 사용자의 옷차림을 분석해 날씨와 적합한지 판단해주는 웹 애플리케이션을 만들기로 했다.
 
 <img src="https://user-images.githubusercontent.com/18097984/136150543-220cac34-e572-46f3-9966-c1e30ba389fc.png" width="75%" alt="screenshot"/>
