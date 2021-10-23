@@ -203,9 +203,9 @@ save_csv(sorted_troubles, "troubles.csv")
 
 주로 맨 마지막에 오는 id 를 가진 데이터가 제대로 평가된 데이터인 것 같아 보였다.
 
-예를 들어 troubles.csv 이미지의 68, 69번째 줄에 나타난 데이터를 보면 먼저 티셔츠, 그 다음은 블라우스로 평가되어 있는데,
+예를 들어 troubles.csv 이미지의 68, 69번째 줄에 나타난 데이터를 보면 먼저 `티셔츠`, 그 다음은 `블라우스`로 평가되어 있는데,
 
-해당되는 이미지를 직접 확인해보니 블라우스가 더 적합해 보였다.
+해당되는 이미지를 직접 확인해보니 `블라우스`가 더 적합해 보였다.
 
 <img src="https://user-images.githubusercontent.com/18097984/137462076-fafeb517-e70e-478c-a44e-434d214b9456.JPG" width="40%" alt="example" />
 
