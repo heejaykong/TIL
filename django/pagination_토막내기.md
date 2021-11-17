@@ -1,4 +1,4 @@
-**2021.11.10 기록**
+**2021.11.10. 기록**
 
 # 장고로 pagination 토막내는 방법
 
@@ -17,6 +17,45 @@
 ![image](https://user-images.githubusercontent.com/18097984/141092787-7b7dabdc-4dae-4139-bf76-5da8a9a19e7a.png)
 
 자세한 내용은 아래 참고링크를 차례대로 확인하자.
+
+
+**2021.11.16. 기록**
+
+프로젝트의 장고 버전이 3.2. 이하인 바람에, 장고 자체를 업데이트하는것보단 내가 `Paginator.get_elided_page_range`와 동일한 로직을 직접 구현하는 게 나아보였다.
+
+그래서 아래와 같은 코드로 구현했다. 참고목록의 첫번째 링크에서 Rob L 이라는 사람이 남긴 stack overflow 답변을 참고했다.
+
+``` python
+<ul class="pagination">
+    {% if my_obj.has_previous %}
+        <a href="?page={{ my_obj.previous_page_number }}"><li><i class="fa fa-chevron-left"></i></li></a>
+    {% else %}
+        <li class="disabled"><i class="fa fa-chevron-left"></i></li>
+    {% endif %}
+
+    {% for i in page_range|default_if_none:my_obj.paginator.get_elided_page_range %}
+        {% if my_obj.number == i %}
+            <li class="active">
+                <span>{{ i }}<span class="sr-only">(current)</span></span>
+            </li>
+        {% else %}
+            {% if i == my_obj.paginator.ELLIPSIS %}
+                <li><span>{{ i }}</span></li>
+            {% else %}
+                <a href="?page={{ i }}"><li>{{ i }}</li></a>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+
+    {% if my_obj.has_next %}
+        <a href="?page={{ my_obj.next_page_number }}">
+            <li><i class="fa fa-chevron-right"></i></li>
+        </a>
+    {% else %}
+        <li class="disabled"><i class="fa fa-chevron-right"></i></li>
+    {% endif %}
+</ul>
+```
 
 ### 참고
 * [Display only some of the page numbers by django pagination](https://stackoverflow.com/a/66772817)
