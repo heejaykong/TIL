@@ -34,7 +34,7 @@ img {
 
 _위 이미지를 보면 상세정보에 방향: 8(90도 시계방향으로 회전함)이라고 되어있다._
 
-`image-orientation: from-image;`는 이미지를 그릴 때, 기존 이미지데이터의 orientation(방향) 데이터를 보고 그대로 똑같이 적용해주는 **디폴트** 값이다.
+`image-orientation: from-image;`에서 `from-image`는 이미지를 그릴 때, 이런 orientation(방향) 데이터를 똑같이 적용해주는 값이며, 따로 지정해주지 않아도 작용하는 **디폴트** 값이다.
 
 그런데 이 `image-orientation` property가 모든 브라우저 버전에 지원이 되지는 않고, 크롬 같은 경우에는 81 버전부터 지원이 된다.
 
