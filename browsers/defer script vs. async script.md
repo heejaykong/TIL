@@ -31,3 +31,4 @@
 * [브라우저는 어떻게 동작하는가?](https://d2.naver.com/helloworld/59361)
 * [defer, async 스크립트](https://ko.javascript.info/script-async-defer)
 * [스크립트의 실행 시점을 조절하는 Async와 Defer 속성](https://wormwlrm.github.io/2021/03/01/Async-Defer-Attributes-of-Script-Tag.html)
+* [<script> async, defer, async defer, module, nomodule, src, inline - the cheat sheet](https://gist.github.com/jakub-g/385ee6b41085303a53ad92c7c8afd7a6)
