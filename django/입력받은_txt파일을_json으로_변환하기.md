@@ -27,6 +27,7 @@ if form.is_valid():
   data_list = [json.loads(line) for line in txt_file.readlines()] # <--- 요 부분
   for data in data_list:
     # do the post
+...
 ```
 
 이번 삽질로 `read()`, `readlines()`, `json.loads()` 등을 배울 수 있었다.
