@@ -74,21 +74,72 @@ def randomlySplitToDatasets(csv, TRAIN_SIZE, VALID_SIZE, TEST_SIZE):
 train, valid, test = randomlySplitToDatasets(data, 30000, 10000, 10000)
 ```
 
+그 다음 아래처럼 따로 파일로 저장해줬다.
+```python
+TRAIN_PATH = os.path.join(base, "train_data.csv")
+VALID_PATH = os.path.join(base, "valid_data.csv")
+TEST_PATH = os.path.join(base, "test_data.csv")
+
+save_csv(train, TRAIN_PATH)
+save_csv(valid, VALID_PATH)
+save_csv(test, TEST_PATH)
+```
+
+참고로 save_csv는 함수는 다음과 같이 짰다.
+```python
+# 파일로 저장하기
+def save_csv(csv, path):
+    csv.to_csv(path, index = False, encoding="utf-8-sig")
+    print("csv file is saved in", path)
+```
+
+<img src="https://user-images.githubusercontent.com/18097984/149661189-dcf480f8-6331-47e3-83f9-74e7433ac564.png" alt="screenshot" width="35%" />
+
+_위는 저장된 각 파일들의 모습_
+
 ### 2. 분포도 확인하며 이 데이터셋의 한계점 깨닫기
 
-그러나 문제를 발견했다. 위와 같이 test 데이터셋을 예시로 보면, 랜덤하게 뽑은 데이터셋임에도 distribution을 실제로 찍어보면 결코 데이터 분포가 고르지 않다는 걸 알 수 있다.
+문제를 발견했다. 아래 test 데이터셋을 예시로 보면, 랜덤하게 뽑은 데이터셋임에도 그 distribution을 실제로 찍어보니 결코 데이터 분포가 고르지 않다는 걸 알 수 있다.
+
+클래스 분포가 고르지 못하면 모델을 학습시킬 때 문제가 된다. 예를 들어 긴팔 티셔츠가 압도적으로 많은 데이터셋으로 학습시킨 모델은 어떤 인풋이 들어와도 긴팔 티셔츠만 아웃풋으로 내놓을 것이다.
 
 데이터셋 자체의 문제점으로 보인다.
 
-![image](https://user-images.githubusercontent.com/18097984/149630365-580d5b51-af1a-491a-869b-9e3f47527ec4.png)
+<img src="https://user-images.githubusercontent.com/18097984/149630365-580d5b51-af1a-491a-869b-9e3f47527ec4.png" alt="screenshot" width="70%" />
 
 _클래스 분포도가 그리 고르지는 않은 걸 볼 수 있다._
 
-우리는 학습시킬 때 이 부분은 어쩔 수 없이 안고 가기로 했다 ㅠ 만약 프로젝트를 더 개선할 수 있다면 이 분포도를 개선하는 것이 좋을 것이다.
+참고로 분포를 찍어내는 코드는 다음과 같이 짰다.
+
+```python
+def showDistribution(csv):
+    # '카테고리'와 '소매기장' 칼럼들을 다루기 위해 우선 칼럼명을 각각 list에 넣어준다
+    classes = list(csv.columns[2:])
+    categories = classes[:7]
+    sleeves = classes[7:]
+    
+    # '카테고리'(니트웨어, 브라탑, 블라우스, 셔츠...)와 '소매기장'(긴팔, 7부, 반팔...) 칼럼으로
+    # 만들 수 있는 모든 조합을 각각 sub dataframe으로 만들어 list에 저장한다.
+    DATAFRAME_ARR = []
+    combinations = []
+    for i, category in enumerate(categories):
+        for j, sleeve in enumerate(sleeves):
+            combinations.append(sleeve + " " + category)
+            sub = csv[(csv[sleeve] == 1) & (csv[category] == 1)]
+            DATAFRAME_ARR.append(sub)
+    
+    for i, DATAFRAME in enumerate(DATAFRAME_ARR):
+#         print(combinations[i], ":", len(DATAFRAME))
+        print('{:10}'.format(combinations[i]), ":", len(DATAFRAME))
+```
+
+이 문제는 데이터셋을 아예 처음부터 다시 선정하지 않는 이상 해결할 방법이 사실상 없기 때문에,
+
+어쩔 수 없이 감수하고 계속 진행하기로 했다 ㅠ 만약 추후에 프로젝트를 더 개선할 수 있다면 이 분포도를 자체적으로 개선하거나 다른 데이터셋을 가져오는 것이 좋을 것이다.
 
 ## 3. 전체코드 및 마무리
 
-전체코드는 다음과 같다.
+위에서 계속 설명해온 코드까지 포함한, 이번 전처리에 활용한 전체코드는 다음과 같다.
 
 ```python
 import os
@@ -169,6 +220,8 @@ save_csv(test, TEST_PATH)
 ```python
 # To be continued... (4._image_move.ipynb)
 ```
+
+다음 포스트에서는 이 데이터들에 해당하는 실제 이미지들을 원하는 디렉토리에 옮기는 작업을 기록할 예정이다.
 
 ### 참고
 * [Random row selection in Pandas dataframe](https://stackoverflow.com/questions/15923826/random-row-selection-in-pandas-dataframe)
