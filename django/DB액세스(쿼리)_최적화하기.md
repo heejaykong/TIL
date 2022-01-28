@@ -213,9 +213,19 @@ class TheModel(models.Model):
 
 공식문서에서 하라는 대로 하고 실제로 개선이 되는 순간을 목격하니까 정말 신기했다.
 
+<img alt="로딩속도" src="https://user-images.githubusercontent.com/18097984/147402549-f12503cb-aba0-4f0d-9272-08be4b27f21e.png" />
+
 <img alt="개선된로딩속도" src="https://user-images.githubusercontent.com/18097984/147432889-3c40cb2c-c4f8-436a-8f8e-038f5b91e822.png">
 
 _개선된 로딩속도. 이전에 6 ~ 7초가 소요되던 것과는 달리 지금은 1 ~ 2초 정도만 소요된다._
+
++) 수정된 코드를 이용하는 또 다른 기능에서도 덩달아 개선효과가 나타났다.
+
+<img alt="기존로딩속도2" src="https://user-images.githubusercontent.com/18097984/151532963-fdabb403-9349-4823-a8f7-f013104aabbd.png">
+
+<img alt="개선된로딩속도2" src="https://user-images.githubusercontent.com/18097984/151532937-d47b9f66-3525-4f89-acb5-ade3d1ab699c.png">
+
+_18 ~ 20초가 소요되던 화면이 5초 정도만 소요된다._
 
 이번 과제로 django만의 QuerySet의 특징, QuerySet 캐시 활용, 효율적인 DB 접근 방식 등을 익힐 수 있어 좋았을 뿐더러, 실제 프로덕트의 사용성 개선에도 기여할 수 있어 뿌듯했다.
 
