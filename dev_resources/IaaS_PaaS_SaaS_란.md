@@ -25,3 +25,4 @@ IaaS:
 * (도서) 히라야마 쯔요시 외, 그림으로 배우는 클라우드 인프라와 API의 구조, 로드북(2017), 38쪽
 * [IaaS, PaaS 및 SaaS 비교](https://www.redhat.com/ko/topics/cloud-computing/iaas-vs-paas-vs-saas)
 * [What is Platform as a Service? PaaS examples + SaaS vs PaaS vs IaaS](https://www.zendesk.kr/blog/what-is-paas/)
+* [IaaS, PaaS, and SaaS: 클라우드 서비스 모델 개요](https://freshdesk.com/ko/kblogs/iaas-paas-saas/)
