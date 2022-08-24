@@ -10,7 +10,7 @@ SaaS, PaaS, IaaS란
 
 SaaS:
 
-최종 사용자가 직접 사용하는 애플리케이션 환경의 클라우드 서비스(예: Dropbox, Gmail, Slack 등)
+최종 사용자가 직접 사용하는 애플리케이션 환경을 제공하는 클라우드 서비스(예: Dropbox, Gmail, Slack 등)
 
 
 PaaS:
@@ -19,7 +19,7 @@ PaaS:
 
 IaaS:
 
-가상화된 환경에서 서버, 네트워크, 스토리지 등 IT 인프라의 3대 요소를 자유롭게 조합해 나만의 인프라를 구축할 수 있는 클라우드 서비스(예: AWS, Microsoft Azure, Google Compute Engine(GCE) 등)
+가상화된 환경에서 서버, 네트워크, 스토리지 등 IT 인프라의 3대 요소를 자유롭게 조합해 나만의 인프라를 구축하게 해주는 클라우드 서비스(예: AWS, Microsoft Azure, Google Compute Engine(GCE) 등)
 
 ### 참고
 * (도서) 히라야마 쯔요시 외, 그림으로 배우는 클라우드 인프라와 API의 구조, 로드북(2017), 38쪽
