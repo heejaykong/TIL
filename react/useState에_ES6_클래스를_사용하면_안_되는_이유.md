@@ -6,6 +6,7 @@
 1. 클래스는 mutable한 데 반해, 리액트의 state는 immutable해야만 한다.
 2. 애시당초 리액트가 권장하는 useState hook 사용 방식은, 관리되는 상태값들을 스칼라값으로 쪼개거나, 같은 시기에 갱신되는 비슷한 성격의 놈들끼리 최소한 묶어서 관리하는 방식이다.
 3. 따라서 캡슐화를 명분으로 useState에 굳이 ES6 클래스 객체를 집어넣는 괜한 짓은 하지 말자는 결론.
+4. 맘에 안들면 [useReducer](https://reactjs.org/docs/hooks-reference.html#usereducer) 또는 커스텀 hook을 작성하면 된다.
 
 투두리스트 프로그램을 리액트로 짜다가, KanbanBoard, Task 등의 정보가 담긴 객체들을 상태로써 관리를 해줘야 했다.
 
