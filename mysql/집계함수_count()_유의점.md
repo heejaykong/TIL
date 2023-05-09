@@ -12,3 +12,6 @@
 
 ![count()유의1](https://user-images.githubusercontent.com/18097984/236709347-ed8ba801-bcbd-4959-8b0f-80c3701f10d2.jpg)
 ![count()유의2](https://user-images.githubusercontent.com/18097984/236709351-260ea9ed-9465-45ab-a221-344cbce5099d.jpg)
+
+### 참고
+* [kocw - 데이터베이스의 원리와 응용(한양대학교 백현미)](http://www.kocw.net/home/search/kemView.do?kemId=1163794)
