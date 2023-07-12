@@ -44,6 +44,7 @@ export default Home;
 
 1. 클래스는 mutable한 데 반해, 리액트의 state는 immutable해야만 한다.
 2. 애시당초 리액트가 권장하는 useState hook 사용 방식은, 관리되는 상태값들을 스칼라값으로 쪼개거나, 같은 시기에 갱신되는 비슷한 성격의 놈들끼리 최소한 묶어서 관리하는 방식이다.
+    > 공식문서에서 강조하는 내용: "...we recommend to split state into multiple state variables based on which values tend to change together."
 
 아래 참고 목록의 첫번째 질의응답(Should Javascript ES6 Classes be Used as React State?)이 도움이 많이 됐다. 자세한 내용은 아래 링크를 자세히 읽어보자.
 
