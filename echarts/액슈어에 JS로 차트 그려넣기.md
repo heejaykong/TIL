@@ -3,6 +3,7 @@
 ### 이 모든 것의 시작을 부른 하나의 블로그 글: [Axure Tutorial: Use JavaScript in Axure to Make Data Visualization Chart](https://axureboutique.com/en-kr/blogs/axure-tutorials/use-javascript-in-axure-to-call-echarts-charts)
 
 ## 참고 자료
+⚠⚠⚠⚠ 액슈어에 코드 복붙할 때는 반드시 주석 제거하기 ⚠⚠⚠⚠
 
 ![image](https://github.com/heejaykong/TIL/assets/18097984/95bda9e3-0b0b-4b8e-aa55-4e72937d9c3c)
 
